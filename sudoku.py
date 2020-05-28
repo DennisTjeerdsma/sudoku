@@ -1,19 +1,27 @@
 class Cell(object):
     def __init__(self, row, column, editable=True, value=0):
-        self.row:int = row               # The row of the cell object, rows can have a value of 0 - 8
-        self.column: int = column           # The column of the cell object, columns can have a value of 0-8
-        self.editable = editable            # Editable property of the cell, if editable is true, the value can be adjusted
-        self.value: int = value             # The value of the object cell
-        self.possibleValues = set()
+        """
+        The cell class holds the attributes of 1 unit cell of Sudoku. The cells has the following attributes:
+        - Row index from 0-8 holding the row from top to bottom
+        - Column index from 0-8 holding thhe columns from left to right
+        - Editable parameter specifying if the current cells value is permanent or fluent
+        - Value, the value currently stored in the cell from 0-9, 0 indicating no current value being held
+        - Possible Values, a set of possible values for the cell based on the regions a cell occupies
+        """
+        self._row:int = row               # The row of the cell object, rows can have a value of 0 - 8
+        self._column: int = column           # The column of the cell object, columns can have a value of 0-8
+        self._editable = editable            # Editable property of the cell, if editable is true, the value can be adjusted
+        self._value: int = value             # The value of the object cell
+        self._possibleValues = set()
 
     @property
     def row(self) -> int:
-        # property of cell retrieving the private _row index of the cell instance
+        # property of cell retrieving the row index of the cell instance
         return self._row
 
     @row.setter
     def row(self, r) -> int:
-        # property of cell setting the private _row index of the cell instance, value must be between 0 - 8, hard coded for 9x9 sudoku
+        # property of cell setting the row index of the cell instance, value must be between 0 - 8, hard coded for 9x9 sudoku
         if (r < 0 or r > 8): raise ValueError("Row value must be a value of 0 or higher or 8 or lower")
         self._row = r
 
@@ -23,7 +31,7 @@ class Cell(object):
 
     @column.setter
     def column(self, c) -> int:
-        # property of cell setting the private _column index of the cell instance, value must be between 0 - 8, hard coded for 9x9 sudoku
+        # property of cell setting the column index of the cell instance, value must be between 0 - 8, hard coded for 9x9 sudoku
         if (c < 0 or c > 8): raise ValueError("Column value must be a value of 0 or higher or 8 or lower ")
         self._column = c
 
@@ -35,7 +43,7 @@ class Cell(object):
     @value.setter
     def value(self, v) -> int:
         # Value setter of the cell class, throws an error if the cell is not editable or if the value is not from 1 to 9
-        if self.editable is False and v != 0:
+        if self.editable is False and v!= 0:
             raise AttributeError("Cell is not editable")
         elif v < 0 or v > 9:
             raise ValueError(f"Incorrect value {v} not between or equal to <1,9>")
@@ -59,24 +67,44 @@ class Region(object):
     The type of the class is not nexecarry
     """
     def __init__(self):
-        self._cells = []
+        self._cells = []    # initializes empty private array variable for Region to hold cells in
+        
+    def add_cell(self, cell: Cell):
+        """
+        Function adding cell to the region, check if cell is already in list 
+        """
+        if not cell in self._cells:
+            self._cells.append(cell)
 
     @property
     def cells(self):
-        return self._cells
-
+        return self._cells  
+        
 class Sudoku(object):
     """
     Class holding the sudoku game object. 
     Cells are generated based on the 2d input puzzle.
+    #
+    Attributes:
+    - Puzzle, hold a 2d array of the actual sudoku puzzle. 0's indicate empty fields
+    - Cells, holds the cell objects in the current puzzle
+    #
     """
     def __init__(self, puzzle):
         self._puzzle = puzzle# Value holding a 2d array of the to be solved puzzle
-        self._cells = []
-    
+        self._regions = [Region() for x in range(0, 27)]
+
+        reg = 0
+
+        for row in range(0, 9):
+            for column in range(0, 9):
+                self._regions[row].add_cell(Cell(row, column, self._puzzle[row][column]))
+                self._regions[row+column].add_cell(Cell(row, column, self._puzzle[row][column])) 
+            reg += 1
     @property
     def puzzle(self):
         return self._puzzle
+
 
 class SudokuSerializer(object):
     """
@@ -93,8 +121,7 @@ class SudokuSerializer(object):
             return Sudoku(l)
 
 if __name__ == '__main__':
-    cell = Cell(8,4, False, 0)
-    
+    cell = Cell(8,4, False, 0)    
     sudoku_string = """
                     500009100
                     000062508
@@ -106,7 +133,5 @@ if __name__ == '__main__':
                     058700300
                     000040800         
                     """
-    print("TEST")
 
     sudoku = SudokuSerializer.create_from_string(sudoku_string)
-      

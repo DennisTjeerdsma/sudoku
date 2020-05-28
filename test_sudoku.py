@@ -3,6 +3,7 @@ import unittest
 from sudoku import Cell as CellClass
 from sudoku import Sudoku as SudokuClass
 from sudoku import SudokuSerializer
+from sudoku import Region as RegionClass
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -19,14 +20,10 @@ class Test(unittest.TestCase):
                     070000056
                     058700300
                     000040800         
-                    """)
-    def test_1_cell_exception_handling(self):
-        self.assertRaises(ValueError, CellClass, 10, 4)
-        self.assertRaises(ValueError, CellClass, -1, 3)
-        self.assertRaises(ValueError, CellClass, 2, -1)
-        self.assertRaises(ValueError, CellClass, 2, 9)
+                    """)  
+        self.region1 = [0,1,2,3,4,5,6,7,8]  
 
-    def test_2_cell_value_assignment(self):
+    def test_1_cell_value_assignment(self):
         self.assertEqual(self.cell1.row, 4)
         self.assertEqual(self.cell1.column, 3)
         self.assertEqual(self.cell1.value, 1)
@@ -47,9 +44,13 @@ class Test(unittest.TestCase):
         self.assertTrue(self.cell1.editable)
         self.assertEqual(self.cell2.value, 4)
         self.assertFalse(self.cell2.editable)
-        self.assertRaises(AttributeError, self.cell2.value, 2)
-        self.assertEqual(self.cell1.value(5), 5)
-        
+        self.cell1.value = 4
+        self.assertEqual(self.cell1.value, 4)
+
+    def test5_check_region(self):
+        cells = [CellClass(1,i, self.region1[i]) for i in range(len(self.region1))]
+        print(cells)
+
 if __name__ == '__main__':
     unittest.main()
     print("All tests passed")
