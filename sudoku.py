@@ -92,19 +92,24 @@ class Sudoku(object):
     """
     def __init__(self, puzzle):
         self._puzzle = puzzle# Value holding a 2d array of the to be solved puzzle
-        self._regions = [Region() for x in range(0, 27)]
+        self._size = int(len(self._puzzle))
+        self._regions = [Region() for _ in range(0, 3*self._size)]
 
-        reg = 0
-
-        for row in range(0, 9):
-            for column in range(0, 9):
-                self._regions[row].add_cell(Cell(row, column, self._puzzle[row][column]))
-                self._regions[row+column].add_cell(Cell(row, column, self._puzzle[row][column])) 
-            reg += 1
     @property
     def puzzle(self):
         return self._puzzle
 
+    @property
+    def regions(self):
+        return self._regions
+
+    def initialize_board(self):
+        for r_i, row in enumerate(self._puzzle):
+            for c_i, column in enumerate(row):
+                temp_cell = Cell(r_i, c_i, False if column == 0 else True , column)
+                self._regions[r_i].add_cell(temp_cell)
+                self._regions[self._size + c_i].add_cell(temp_cell)
+        
 
 class SudokuSerializer(object):
     """
@@ -135,3 +140,5 @@ if __name__ == '__main__':
                     """
 
     sudoku = SudokuSerializer.create_from_string(sudoku_string)
+    sudoku.initialize_board()
+    print(sudoku.regions[0].cells[0].value)
