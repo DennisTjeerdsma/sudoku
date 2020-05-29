@@ -51,6 +51,12 @@ class Test(unittest.TestCase):
         cells = [CellClass(1,i, self.region1[i]) for i in range(len(self.region1))]
         print(cells)
 
+    def test6_check_cell_possible_values(self):
+        cell = Cell(0, 0, editable=True, value=0)
+        possible_values = set(range(1, 10))
+        self.assertEqual(cell.possible_values, possible_values)
+        cell.value = 1
+
 if __name__ == '__main__':
     unittest.main()
     print("All tests passed")
